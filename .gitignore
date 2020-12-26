@@ -118,3 +118,6 @@ all.config
 kernel/configs/android-*.cfg
 
 out/
+zip/
+silont-clang/
+aarch64-linux-android-4.9/
