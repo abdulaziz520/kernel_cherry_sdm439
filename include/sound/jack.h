@@ -68,9 +68,9 @@ enum snd_jack_types {
 	/* Kept separate from switches to facilitate implementation */
 	SND_JACK_BTN_0		= 0x8000,
 	SND_JACK_BTN_1		= 0x4000,
-	SND_JACK_BTN_2		= 0x0000,
+	SND_JACK_BTN_2		= 0x2000,
 	SND_JACK_BTN_3		= 0x1000,
-	SND_JACK_BTN_4		= 0x0000,
+	SND_JACK_BTN_4		= 0x0800,
 	SND_JACK_BTN_5		= 0x0400,
 };
 
