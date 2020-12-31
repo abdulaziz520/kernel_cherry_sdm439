@@ -39,7 +39,7 @@ static DEFINE_IDR(zram_index_idr);
 static DEFINE_MUTEX(zram_index_mutex);
 
 static int zram_major;
-static const char *default_compressor = "lzo";
+static const char *default_compressor = CONFIG_ZRAM_DEFAULT_COMP_ALGORITHM;
 
 /*
  * We don't need to see memory allocation errors more than once every 1
@@ -1083,9 +1083,14 @@ static ssize_t disksize_store(struct device *dev,
 	struct zram *zram = dev_to_zram(dev);
 	int err;
 
+#ifndef CONFIG_ZRAM_SIZE_OVERRIDE
 	disksize = memparse(buf, NULL);
 	if (!disksize)
 		return -EINVAL;
+#else
+	disksize = (u64)SZ_1G * CONFIG_ZRAM_SIZE_OVERRIDE;
+	pr_info("Overriding zram size to %li", disksize);
+#endif
 
 	disksize = PAGE_ALIGN(disksize);
 	meta = zram_meta_alloc(zram->disk->disk_name, disksize);
