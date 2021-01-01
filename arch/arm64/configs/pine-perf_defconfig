@@ -791,3 +791,6 @@ CONFIG_ADRENO_IDLER=y
 
 # Autocut
 CONFIG_AUTOCUT_CHARGER=y
+
+# Boeffla wakelock blocker
+CONFIG_BOEFFLA_WL_BLOCKER=y
