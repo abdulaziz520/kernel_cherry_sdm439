@@ -897,3 +897,6 @@ CONFIG_UPROBE_EVENT=y
 
 # CPU frequency statistics
 CONFIG_CPU_FREQ_STAT=y
+
+# CMDLINE
+CONFIG_CMDLINE="elevator=maple audit=0 mitigations=off"
