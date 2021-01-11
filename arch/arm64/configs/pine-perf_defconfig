@@ -900,3 +900,6 @@ CONFIG_CPU_FREQ_STAT=y
 
 # CMDLINE
 CONFIG_CMDLINE="elevator=maple audit=0 mitigations=off"
+
+# Power efficient workqueue
+CONFIG_WQ_POWER_EFFICIENT_DEFAULT=y
