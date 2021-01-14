@@ -122,4 +122,5 @@ kernel/configs/android-*.cfg
 out/
 zip/
 silont-clang/
+silont-clang-master/
 aarch64-linux-android-4.9/

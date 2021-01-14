@@ -1,0 +1,59 @@
+version: 2.1
+jobs:
+  run:
+   docker:
+      - image: ubuntu:latest
+   steps:
+      - run:
+          name: Setting up build environment
+          command: |
+           apt-get update -y
+           apt-get upgrade -y
+           export DEBIAN_FRONTEND=noninteractive
+           ln -fs /usr/share/zoneinfo/UTC /etc/localtime
+           apt-get install tzdata -y
+           dpkg-reconfigure --frontend noninteractive tzdata
+           apt-get install bc bash git-core gnupg gnupg2 build-essential \
+           zip curl make automake autogen autoconf autotools-dev libtool shtool python \
+           m4 gcc libtool zlib1g-dev flex bison libssl-dev unzip tar xz-utils \
+           software-properties-common device-tree-compiler wget -y
+           mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+      - run: 
+          name: Cloning kernel sources
+          command: |
+            git clone --depth 1 --single-branch --recurse-submodules "$CIRCLE_REPOSITORY_URL" --branch "$CIRCLE_BRANCH" .
+      - run:
+          name: Cloning toolchains
+          command: |
+           # too slow: git clone https://github.com/silont-project/silont-clang.git --depth=1 --single-branch
+           wget https://github.com/silont-project/silont-clang/archive/master.zip
+           unzip master.zip
+           git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 --depth=1 --single-branch --branch=android10-mainline-release
+      - run:
+          name: Building
+          command: |
+           export ARCH=arm64 && export SUBARCH=arm64 && export DTC_EXT=dtc
+           make O=out ARCH=arm64 pine-perf_defconfig
+           export PATH="$(pwd)/silont-clang-master/bin:$(pwd)/aarch64-linux-android-4.9/bin:${PATH}"
+           make -j$(nproc --all) O=out \
+                                 ARCH=arm64 \
+                                 CC=clang \
+                                 CLANG_TRIPLE=aarch64-linux-gnu- \
+                                 CROSS_COMPILE=aarch64-linux-android-
+           aarch64-linux-gnu-strip --strip-unneeded --strip-debug out/drivers/staging/prima/wlan.ko
+      - run:
+          name: Creating flashable zip
+          command: |
+           cp out/drivers/staging/prima/wlan.ko AnyKernel3/modules/vendor/lib/modules/pronto_wlan.ko
+           cp out/arch/arm64/boot/Image.gz-dtb AnyKernel3/
+           cp out/arch/arm64/boot/dtbo.img AnyKernel3/
+           mkdir -p /tmp/output
+           cd AnyKernel3
+           zip "/tmp/output/CherryKernel-${CIRCLE_SHA1}.zip" -r *
+      - store_artifacts:
+          path: /tmp/output
+workflows:
+  version: 2.1
+  cooking:
+    jobs:
+      - run
