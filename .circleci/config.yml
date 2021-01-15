@@ -6,8 +6,8 @@ jobs:
    steps:
       - restore_cache:
           keys:
-            - apt-cache-{{ checksum "/var/lib/dpkg/available" }}
-            - apt-cache-
+            - v1-apt-cache-{{ checksum "/var/lib/dpkg/available" }}
+            - v1-apt-cache-
       - run:
           name: Setting up build environment
           command: |
@@ -28,48 +28,48 @@ jobs:
            # Fix GitHub SSH key checking
            mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
       - save_cache:
-          key: apt-cache-{{ checksum "/var/lib/dpkg/available" }}
+          key: v1-apt-cache-{{ checksum "/var/lib/dpkg/available" }}
           paths:
             - /var/cache/apt
       - restore_cache:
           keys:
-            - source-cache-{{ .Branch }}-{{ .Revision }}
-            - source-cache-{{ .Branch }}-
-            - source-cache-
+            - v1-source-cache-{{ .Branch }}-{{ .Revision }}
+            - v1-source-cache-{{ .Branch }}-
+            - v1-source-cache-
       - run: 
           name: Cloning kernel sources
           command: |
             git pull --rebase || git clone --depth 1 --single-branch --recurse-submodules "$CIRCLE_REPOSITORY_URL" --branch "$CIRCLE_BRANCH" .
       - save_cache:
-          key: source-cache-{{ .Branch }}-{{ .Revision }}
+          key: v1-source-cache-{{ .Branch }}-{{ .Revision }}
           paths:
             - ~/project
       - restore_cache:
           keys:
-            - toolchains-clang-{{ checksum "~/project/silont-clang/.git/refs/master" }}
-            - toolchains-clang-
+            - v1-toolchains-clang-{{ checksum "~/project/silont-clang/.git/refs/master" }}
+            - v1-toolchains-clang-
       - restore_cache:
           keys:
-            - toolchains-gcc-{{ checksum "~/project/aarch64-linux-android-4.9/.git/refs/android10-mainline-release" }}
-            - toolchains-gcc-
+            - v1-toolchains-gcc-{{ checksum "~/project/aarch64-linux-android-4.9/.git/refs/android10-mainline-release" }}
+            - v1-toolchains-gcc-
       - run:
           name: Cloning toolchains
           command: |
            git -C "silont-clang" pull --rebase || git clone https://github.com/silont-project/silont-clang.git --depth=1 --single-branch
            git -C "aarch64-linux-android-4.9" pull --rebase || git clone  https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 --depth=1 --single-branch --branch=android10-mainline-release
       - save_cache:
-          key: toolchains-clang-{{ checksum "~/project/silont-clang/.git/refs/master" }}
+          key: v1-toolchains-clang-{{ checksum "~/project/silont-clang/.git/refs/master" }}
           paths:
             - ~/project/silont-clang
       - save_cache:
-          key: toolchains-gcc-{{ checksum "~/project/aarch64-linux-android-4.9/.git/refs/android10-mainline-release" }}
+          key: v1-toolchains-gcc-{{ checksum "~/project/aarch64-linux-android-4.9/.git/refs/android10-mainline-release" }}
           paths:
             - ~/project/aarch64-linux-android-4.9
       - restore_cache:
           keys:
-            - compiler-cache-{{ .Branch }}-{{ .Revision }}
-            - compiler-cache-{{ .Branch }}-
-            - compiler-cache-
+            - v1-compiler-cache-{{ .Branch }}-{{ .Revision }}
+            - v1-compiler-cache-{{ .Branch }}-
+            - v1-compiler-cache-
       - run:
           name: Building
           command: |
@@ -84,7 +84,7 @@ jobs:
                                  CROSS_COMPILE=aarch64-linux-android-
            aarch64-linux-gnu-strip --strip-unneeded --strip-debug out/drivers/staging/prima/wlan.ko
       - save_cache:
-          key: compiler-cache-{{ .Branch }}-{{ .Revision }}
+          key: v1-compiler-cache-{{ .Branch }}-{{ .Revision }}
           paths:
             - ~/.cache/ccache
             - ~/project/out
