@@ -6,7 +6,7 @@ jobs:
    steps:
       - restore_cache:
           keys:
-            - apt-cache-{{ checksum ".circleci/config.yml" }}
+            - apt-cache-{{ checksum "/var/lib/dpkg/available" }}
             - apt-cache-
       - run:
           name: Setting up build environment
@@ -28,7 +28,7 @@ jobs:
            # Fix GitHub SSH key checking
            mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
       - save_cache:
-          key: apt-cache-{{ checksum ".circleci/config.yml" }}
+          key: apt-cache-{{ checksum "/var/lib/dpkg/available" }}
           paths:
             - /var/cache/apt
       - restore_cache:
