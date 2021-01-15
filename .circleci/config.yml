@@ -6,7 +6,8 @@ jobs:
    steps:
       - restore_cache:
           keys:
-            - apt-cache
+            - apt-cache-{{ checksum ".circleci/config.yml" }}
+            - apt-cache-
       - run:
           name: Setting up build environment
           command: |
@@ -27,42 +28,48 @@ jobs:
            # Fix GitHub SSH key checking
            mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
       - save_cache:
-          key: apt-cache
+          key: apt-cache-{{ checksum ".circleci/config.yml" }}
           paths:
             - /var/cache/apt
       - restore_cache:
           keys:
-            - source-cache-{{ .Branch }}
+            - source-cache-{{ .Branch }}-{{ .Revision }}
+            - source-cache-{{ .Branch }}-
+            - source-cache-
       - run: 
           name: Cloning kernel sources
           command: |
             git pull --rebase || git clone --depth 1 --single-branch --recurse-submodules "$CIRCLE_REPOSITORY_URL" --branch "$CIRCLE_BRANCH" .
       - save_cache:
-          key: source-cache-{{ .Branch }}
+          key: source-cache-{{ .Branch }}-{{ .Revision }}
           paths:
             - ~/project
       - restore_cache:
           keys:
-            - toolchains-clang
+            - toolchains-clang-{{ checksum "~/project/silont-clang/.git/refs/master" }}
+            - toolchains-clang-
       - restore_cache:
           keys:
-            - toolchains-gcc
+            - toolchains-gcc-{{ checksum "~/project/aarch64-linux-android-4.9/.git/refs/android10-mainline-release" }}
+            - toolchains-gcc-
       - run:
           name: Cloning toolchains
           command: |
            git -C "silont-clang" pull --rebase || git clone https://github.com/silont-project/silont-clang.git --depth=1 --single-branch
            git -C "aarch64-linux-android-4.9" pull --rebase || git clone  https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 --depth=1 --single-branch --branch=android10-mainline-release
       - save_cache:
-          key: toolchains-clang
+          key: toolchains-clang-{{ checksum "~/project/silont-clang/.git/refs/master" }}
           paths:
             - ~/project/silont-clang
       - save_cache:
-          key: toolchains-gcc
+          key: toolchains-gcc-{{ checksum "~/project/aarch64-linux-android-4.9/.git/refs/android10-mainline-release" }}
           paths:
             - ~/project/aarch64-linux-android-4.9
       - restore_cache:
           keys:
-            - compiler-cache
+            - compiler-cache-{{ .Branch }}-{{ .Revision }}
+            - compiler-cache-{{ .Branch }}-
+            - compiler-cache-
       - run:
           name: Building
           command: |
@@ -77,7 +84,7 @@ jobs:
                                  CROSS_COMPILE=aarch64-linux-android-
            aarch64-linux-gnu-strip --strip-unneeded --strip-debug out/drivers/staging/prima/wlan.ko
       - save_cache:
-          key: compiler-cache
+          key: compiler-cache-{{ .Branch }}-{{ .Revision }}
           paths:
             - ~/.cache/ccache
             - ~/project/out
