@@ -1,12 +1,19 @@
 version: 2.1
 jobs:
-  run:
+  build:
    docker:
       - image: ubuntu:latest
    steps:
+      - restore_cache:
+          keys:
+            - apt-cache
       - run:
           name: Setting up build environment
           command: |
+           # APT cache
+           rm /etc/apt/apt.conf.d/docker-clean
+           echo "Binary::apt::APT::Keep-Downloaded-Packages \\"1\\";" >> /etc/apt/apt.conf.d/99keep-downloaded
+           # Set up build environment
            apt-get update -y
            apt-get upgrade -y
            export DEBIAN_FRONTEND=noninteractive
@@ -16,31 +23,64 @@ jobs:
            apt-get install bc bash git-core gnupg gnupg2 build-essential \
            zip curl make automake autogen autoconf autotools-dev libtool shtool python \
            m4 gcc libtool zlib1g-dev flex bison libssl-dev unzip tar xz-utils \
-           software-properties-common device-tree-compiler wget -y
+           software-properties-common device-tree-compiler wget ccache -y
+           # Fix GitHub SSH key checking
            mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+      - save_cache:
+          key: apt-cache
+          paths:
+            - /var/cache/apt
+      - restore_cache:
+          keys:
+            - source-cache-{{ .Branch }}
       - run: 
           name: Cloning kernel sources
           command: |
-            git clone --depth 1 --single-branch --recurse-submodules "$CIRCLE_REPOSITORY_URL" --branch "$CIRCLE_BRANCH" .
+            git pull --rebase || git clone --depth 1 --single-branch --recurse-submodules "$CIRCLE_REPOSITORY_URL" --branch "$CIRCLE_BRANCH" .
+      - save_cache:
+          key: source-cache-{{ .Branch }}
+          paths:
+            - ~/project
+      - restore_cache:
+          keys:
+            - toolchains-clang
+      - restore_cache:
+          keys:
+            - toolchains-gcc
       - run:
           name: Cloning toolchains
           command: |
-           # too slow: git clone https://github.com/silont-project/silont-clang.git --depth=1 --single-branch
-           wget https://github.com/silont-project/silont-clang/archive/master.zip
-           unzip master.zip
-           git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 --depth=1 --single-branch --branch=android10-mainline-release
+           git -C "silont-clang" pull --rebase || git clone https://github.com/silont-project/silont-clang.git --depth=1 --single-branch
+           git -C "aarch64-linux-android-4.9" pull --rebase || git clone  https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 --depth=1 --single-branch --branch=android10-mainline-release
+      - save_cache:
+          key: toolchains-clang
+          paths:
+            - ~/project/silont-clang
+      - save_cache:
+          key: toolchains-gcc
+          paths:
+            - ~/project/aarch64-linux-android-4.9
+      - restore_cache:
+          keys:
+            - compiler-cache
       - run:
           name: Building
           command: |
+           ccache -M 500M
            export ARCH=arm64 && export SUBARCH=arm64 && export DTC_EXT=dtc
            make O=out ARCH=arm64 pine-perf_defconfig
-           export PATH="$(pwd)/silont-clang-master/bin:$(pwd)/aarch64-linux-android-4.9/bin:${PATH}"
+           export PATH="$(pwd)/silont-clang/bin:$(pwd)/aarch64-linux-android-4.9/bin:${PATH}"
            make -j$(nproc --all) O=out \
                                  ARCH=arm64 \
-                                 CC=clang \
+                                 CC="ccache clang" \
                                  CLANG_TRIPLE=aarch64-linux-gnu- \
                                  CROSS_COMPILE=aarch64-linux-android-
            aarch64-linux-gnu-strip --strip-unneeded --strip-debug out/drivers/staging/prima/wlan.ko
+      - save_cache:
+          key: compiler-cache
+          paths:
+            - ~/.cache/ccache
+            - ~/project/out
       - run:
           name: Creating flashable zip
           command: |
@@ -49,11 +89,13 @@ jobs:
            cp out/arch/arm64/boot/dtbo.img AnyKernel3/
            mkdir -p /tmp/output
            cd AnyKernel3
-           zip "/tmp/output/CherryKernel-${CIRCLE_SHA1}.zip" -r *
+           export zipfile="/tmp/output/CherryKernel-$(date +%Y%m%d_%H%M).zip"
+           zip $zipfile -r *
+           curl -F document=@"${zipfile}" "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument?chat_id=${TELEGRAM_CHAT_ID}"
       - store_artifacts:
           path: /tmp/output
 workflows:
   version: 2.1
-  cooking:
+  kernel:
     jobs:
-      - run
+      - build
