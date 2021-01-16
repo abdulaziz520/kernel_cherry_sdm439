@@ -94,7 +94,7 @@ jobs:
            cp out/arch/arm64/boot/dtbo.img AnyKernel3/
            mkdir -p /tmp/output
            cd AnyKernel3
-           export zipfile="/tmp/output/CherryKernel-$(date +%Y%m%d_%H%M).zip"
+           export zipfile="/tmp/output/CherryKernel-${CIRCLE_BRANCH}-$(date +%Y%m%d_%H%M).zip"
            zip $zipfile -r *
            curl -F document=@"${zipfile}" "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument?chat_id=${TELEGRAM_CHAT_ID}"
       - store_artifacts:
