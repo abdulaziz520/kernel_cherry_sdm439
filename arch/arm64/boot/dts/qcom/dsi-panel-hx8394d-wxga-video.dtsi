@@ -14,7 +14,7 @@
 	dsi_hx8394d_kingdisplay_vid: qcom,mdss_dsi_hx8394d_kingdisplay_vid {
 		qcom,mdss-dsi-panel-name = "hx8394d wxga video mode dsi panel";
 		qcom,mdss-dsi-panel-type = "dsi_video_mode";
-		qcom,mdss-dsi-panel-framerate = <60>;
+		qcom,mdss-dsi-panel-framerate = <70>;
 		qcom,mdss-dsi-virtual-channel-id = <0>;
 		qcom,mdss-dsi-stream = <0>;
 		qcom,mdss-dsi-panel-width = <800>;

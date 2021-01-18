@@ -41,7 +41,7 @@
 		qcom,mdss-dsi-t-clk-post = <0x0d>;
 		qcom,mdss-dsi-t-clk-pre = <0x2d>;
 		qcom,mdss-dsi-min-refresh-rate = <55>;
-		qcom,mdss-dsi-max-refresh-rate = <60>;
+		qcom,mdss-dsi-max-refresh-rate = <70>;
 		qcom,mdss-dsi-pan-enable-dynamic-fps;
 		qcom,mdss-dsi-pan-fps-update =
 			"dfps_immediate_porch_mode_vfp";
@@ -57,7 +57,7 @@
 				qcom,mdss-dsi-v-back-porch = <7>;
 				qcom,mdss-dsi-v-front-porch = <8>;
 				qcom,mdss-dsi-v-pulse-width = <1>;
-				qcom,mdss-dsi-panel-framerate = <60>;
+				qcom,mdss-dsi-panel-framerate = <70>;
 				qcom,mdss-dsi-on-command =
 					[15 01 00 00 00 00 02 ff 10
 					15 01 00 00 00 00 02 fb 01

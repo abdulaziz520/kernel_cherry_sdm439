@@ -107,7 +107,7 @@
 	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
 	qcom,mdss-dsi-pan-enable-dynamic-fps;
 	qcom,mdss-dsi-min-refresh-rate = <48>;
-	qcom,mdss-dsi-max-refresh-rate = <60>;
+	qcom,mdss-dsi-max-refresh-rate = <70>;
 	qcom,mdss-dsi-pan-fps-update = "dfps_immediate_porch_mode_vfp";
 };
 
