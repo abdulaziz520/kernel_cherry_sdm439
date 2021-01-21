@@ -94,53 +94,32 @@ struct dkgov_cpu {
 static DEFINE_PER_CPU(struct dkgov_cpu, dkgov_cpu);
 static DEFINE_PER_CPU(struct dkgov_tunables, cached_tunables);
 
-#define LITTLE_NFREQS				16
-#define BIG_NFREQS					25
+#define LITTLE_NFREQS				9
+#define BIG_NFREQS					11
 static unsigned long little_capacity[LITTLE_NFREQS] = {
 	0,
-	149,
-	225,
-	257,
-	281,
-	315,
-	368,
-	406,
-	469,
-	502,
-	538,
-	581,
-	611,
-	648,
-	684,
-	729
+    307200,
+    460800,
+    518400,
+    768000,
+    998400,
+    1171200,
+    1305600,
+    1459200
 };
 
 static unsigned long big_capacity[BIG_NFREQS] = {
 	0,
-	149,
-	188,
-	225,
-	257,
-	281,
-	315,
-	348,
-	374,
-	428,
-	469,
-	502,
-	538,
-	581,
-	611,
-	648,
-	684,
-	729,
-	763,
-	795,
-	832,
-	868,
-	905,
-	952,
-	979
+    499200,
+    652800,
+    844800,
+    960000,
+    1305600,
+    1497600,
+    1708800,
+    1804800,
+    1958400,
+    2016000
 };
 
 /************************ Governor internals ***********************/
