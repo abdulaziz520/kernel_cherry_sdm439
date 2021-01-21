@@ -32,7 +32,7 @@
 #define cpufreq_disable_fast_switch(x)
 #define ACGOV_KTHREAD_PRIORITY	50
 
-#ifdef CONFIG_ARCH_DUMMY
+#ifdef CONFIG_ARCH_SDM439
 #define UP_RATE_LIMIT_US			(20000)
 #define UP_RATE_LIMIT_US_BIGC		(10000)
 #define DOWN_RATE_LIMIT_US			(20000)
@@ -43,7 +43,7 @@
 #define PUMP_DEC_STEP				1
 #define BOOST_PERC					10
 #else
-#define FREQ_RESPONSIVENESS			1056000
+#define FREQ_RESPONSIVENESS			1036000
 #define PUMP_INC_STEP_AT_MIN_FREQ	1
 #define PUMP_INC_STEP				1
 #define PUMP_DEC_STEP_AT_MIN_FREQ	1
@@ -116,7 +116,7 @@ struct acgov_cpu {
 static DEFINE_PER_CPU(struct acgov_cpu, acgov_cpu);
 static DEFINE_PER_CPU(struct acgov_tunables, cached_tunables);
 
-#ifdef CONFIG_ARCH_DUMMY
+#ifdef CONFIG_ARCH_SDM439
 #define LITTLE_NFREQS				8
 #define BIG_NFREQS					9
 static unsigned long little_capacity[LITTLE_NFREQS][2] = {
@@ -273,7 +273,7 @@ static unsigned int resolve_target_freq(struct cpufreq_policy *policy,
 	return target_freq;
 }
 
-#ifdef CONFIG_ARCH_DUMMY
+#ifdef CONFIG_ARCH_SDM439
 static void get_target_capacity(unsigned int cpu, int index,
 					unsigned long *down_cap, unsigned long *up_cap)
 {
@@ -326,7 +326,7 @@ static unsigned int get_next_freq(struct acgov_cpu *sg_cpu, unsigned long util,
 	int pump_inc_step = tunables->pump_inc_step;
 	int pump_dec_step = tunables->pump_dec_step;
 	unsigned int next_freq = 0;
-#ifdef CONFIG_ARCH_DUMMY
+#ifdef CONFIG_ARCH_SDM439
 	unsigned long down_cap = 0, up_cap = 0;
 	unsigned long cur_util =
 			util + ((util * tunables->boost_perc) / 100);
@@ -348,7 +348,7 @@ static unsigned int get_next_freq(struct acgov_cpu *sg_cpu, unsigned long util,
 		pump_inc_step = tunables->pump_inc_step_at_min_freq;
 		pump_dec_step = tunables->pump_dec_step_at_min_freq;
 	}
-#ifdef CONFIG_ARCH_DUMMY
+#ifdef CONFIG_ARCH_SDM439
 	get_target_capacity(policy->cpu, index, &down_cap, &up_cap);
 	if (cur_util >= up_cap
 		&& policy->cur < policy->max) {
@@ -989,7 +989,7 @@ static void get_tunables_data(struct acgov_tunables *tunables,
 	}
 
 initialize:
-#ifdef CONFIG_ARCH_DUMMY
+#ifdef CONFIG_ARCH_SDM439
 	if (cpu < 2)
 		tunables->up_rate_limit_us = UP_RATE_LIMIT_US;
 	else
