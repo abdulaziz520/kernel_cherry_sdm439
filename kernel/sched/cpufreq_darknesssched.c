@@ -98,28 +98,27 @@ static DEFINE_PER_CPU(struct dkgov_tunables, cached_tunables);
 #define BIG_NFREQS					11
 static unsigned long little_capacity[LITTLE_NFREQS] = {
 	0,
-    307200,
-    460800,
-    518400,
-    768000,
-    998400,
-    1171200,
-    1305600,
-    1459200
+    43,
+    43,
+    43,
+    43,
+    56,
+    71,
+    89,
+    120,
 };
 
 static unsigned long big_capacity[BIG_NFREQS] = {
 	0,
-    499200,
-    652800,
-    844800,
-    960000,
-    1305600,
-    1497600,
-    1708800,
-    1804800,
-    1958400,
-    2016000
+    137,
+    137,
+    137,
+    207,
+    256,
+    327,
+    343,
+    445,
+    470
 };
 
 /************************ Governor internals ***********************/
