@@ -24,7 +24,7 @@ jobs:
            apt-get install bc bash git-core gnupg gnupg2 build-essential \
            zip curl make automake autogen autoconf autotools-dev libtool shtool python \
            m4 gcc libtool zlib1g-dev flex bison libssl-dev unzip tar xz-utils \
-           software-properties-common device-tree-compiler wget ccache -y
+           software-properties-common device-tree-compiler wget ccache jq -y
            # Fix GitHub SSH key checking
            mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
       - save_cache:
@@ -47,7 +47,19 @@ jobs:
           name: Cloning toolchains
           command: |
            # too slow: git -C "proton-clang" pull --rebase || git clone https://github.com/kdrag0n/proton-clang.git --depth=1 --single-branch
-           if [ ! -d "proton-clang-master" ]; then wget https://github.com/kdrag0n/proton-clang/archive/master.zip; unzip master.zip; fi
+           download_clang() {
+              wget https://github.com/kdrag0n/proton-clang/archive/master.zip
+              unzip -o master.zip
+              echo $1 > proton-clang-master/last_proton   
+           }
+           clang_revision="$(curl https://api.github.com/repos/kdrag0n/proton-clang/commits/master | jq -r .sha)"
+           if [ -d "proton-clang-master" ]; then 
+            if [ ! "$clang_revision" == "$(cat proton-clang-master/last_proton)" ]; then
+              download_clang $clang_revision
+            fi
+           else
+            download_clang $clang_revision
+           fi
            git -C "aarch64-linux-android-4.9" pull --rebase || git clone  https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 --depth=1 --single-branch --branch=android10-mainline-release
            git -C "arm-linux-androideabi-4.9" pull --rebase || git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9 --depth=1 --single-branch --branch=android10-mainline-release
       - save_cache:
