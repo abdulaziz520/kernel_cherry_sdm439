@@ -79,6 +79,8 @@ jobs:
       - run:
           name: Building
           command: |
+           mkdir -p ~/project/ccache
+           export CCACHE_DIR=~/project/ccache
            ccache -M 500M
            export ARCH=arm64 && export SUBARCH=arm64 && export DTC_EXT=dtc
            make O=out ARCH=arm64 cherry-pine_defconfig
@@ -93,7 +95,7 @@ jobs:
       - save_cache:
           key: v2-compiler-cache-{{ .Branch }}-{{ .Revision }}
           paths:
-            - ~/.cache/ccache
+            - ~/project/ccache
       - run:
           name: Creating flashable zip
           command: |
