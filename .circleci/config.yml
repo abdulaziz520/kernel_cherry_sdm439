@@ -91,7 +91,6 @@ jobs:
                                  CLANG_TRIPLE=aarch64-linux-gnu- \
                                  CROSS_COMPILE=aarch64-linux-android- \
                                  CROSS_COMPILE_ARM32=arm-linux-androideabi-
-           aarch64-linux-gnu-strip --strip-unneeded --strip-debug out/drivers/staging/prima/wlan.ko
       - save_cache:
           key: v2-compiler-cache-{{ .Branch }}-{{ .Revision }}
           paths:
