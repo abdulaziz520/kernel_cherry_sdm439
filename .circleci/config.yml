@@ -91,6 +91,7 @@ jobs:
                                  CLANG_TRIPLE=aarch64-linux-gnu- \
                                  CROSS_COMPILE=aarch64-linux-android- \
                                  CROSS_COMPILE_ARM32=arm-linux-androideabi-
+           out/scripts/sign-file sha512 out/certs/signing_key.pem out/certs/signing_key.x509 out/drivers/staging/prima/wlan.ko
       - save_cache:
           key: v2-compiler-cache-{{ .Branch }}-{{ .Revision }}
           paths:
