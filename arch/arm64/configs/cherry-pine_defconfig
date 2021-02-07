@@ -976,9 +976,6 @@ CONFIG_CMDLINE_EXTEND=y
 # Shrink kernel size
 CONFIG_TRIM_UNUSED_KSYMS=y
 
-# inline optimization
-CONFIG_INLINE_OPTIMIZATION=y
-
 # Merged from Xiaomi's defconfig
 CONFIG_ARCH_MMAP_RND_BITS=16
 CONFIG_SMP=y
