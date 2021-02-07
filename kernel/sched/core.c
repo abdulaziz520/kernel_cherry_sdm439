@@ -138,7 +138,7 @@ const_debug unsigned int sysctl_sched_features =
  * Number of tasks to iterate in a single balance run.
  * Limited because this is done with IRQs disabled.
  */
-const_debug unsigned int sysctl_sched_nr_migrate = 32;
+const_debug unsigned int sysctl_sched_nr_migrate = 4;
 
 /*
  * period over which we average the RT time consumption, measured
@@ -160,7 +160,7 @@ __read_mostly int scheduler_running;
  * part of the period that we allow rt tasks to run in us.
  * default: 0.95s
  */
-int sysctl_sched_rt_runtime = 950000;
+int sysctl_sched_rt_runtime = -1;
 
 /* cpus with isolated domains */
 cpumask_var_t cpu_isolated_map;
@@ -3634,6 +3634,8 @@ static void __sched notrace __schedule(bool preempt)
 		rq->nr_switches++;
 		rq->curr = next;
 		++*switch_count;
+
+		psi_sched_switch(prev, next, !task_on_rq_queued(prev));
 
 		trace_sched_switch(preempt, prev, next);
 		rq = context_switch(rq, prev, next, &rf); /* unlocks the rq */
