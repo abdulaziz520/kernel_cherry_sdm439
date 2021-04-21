@@ -32,4 +32,14 @@ ramdisk_compression=auto;
 split_boot;
 flash_boot;
 flash_dtbo;
+
+# Patches
+ui_print "Mounting /system..."
+mount -o rw,remount /system
+# Prevent init from overriding kernel tweaks.
+ui_print "Patching init..."
+# IMO this is kinda destructive but works
+find /system/etc/init/ -type f | while read file; do 
+sed -Ei 's;[^#](write /proc/sys/(kernel|vm)/(sched|dirty|perf_cpu|page-cluster|stat|swappiness|vfs));#\1;g' $file
+done
 ## end install
