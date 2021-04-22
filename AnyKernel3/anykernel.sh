@@ -41,7 +41,7 @@ mount -o rw,remount /system
 
 # Prima
 ui_print "Setting up Prima..."
-if [ -f "/vendor/lib/modules/pronto_wlan.ko" ]; then
+if [ -d "/vendor/lib/modules" ]; then
     cp pronto_wlan.ko modules/vendor/lib/modules
     # Ugly hack for some ROMs
     if [ -f "/system/lib/modules/pronto_wlan.ko" ]; then
@@ -56,4 +56,15 @@ ui_print "Patching init..."
 find /system/etc/init/ -type f | while read file; do 
 sed -Ei 's;[^#](write /proc/sys/(kernel|vm)/(sched|dirty|perf_cpu|page-cluster|stat|swappiness|vfs));#\1;g' $file
 done
+# lmkd props
+ui_print "Patching system's build.prop..."
+patch_prop /system/build.prop "ro.lmk.kill_heaviest_task" "true"
+patch_prop /system/build.prop "ro.config.low_ram" "false"
+patch_prop /system/build.prop "ro.lmk.use_minfree_levels" "true"
+patch_prop /system/build.prop "ro.lmk.medium" "300"
+patch_prop /system/build.prop "ro.lmk.critical_upgrade" "true"
+patch_prop /system/build.prop "ro.lmk.upgrade_pressure" "95"
+patch_prop /system/build.prop "ro.lmk.downgrade_pressure" "60"
+patch_prop /system/build.prop "ro.lmk.log_stats" "true"
+patch_prop /system/build.prop "ro.lmk.use_psi" "true"
 ## end install
