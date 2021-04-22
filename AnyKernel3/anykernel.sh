@@ -33,9 +33,23 @@ split_boot;
 flash_boot;
 flash_dtbo;
 
-# Patches
-ui_print "Mounting /system..."
+ui_print " "
+
+ui_print "Mounting /vendor and /system..."
+mount -o rw,remount /vendor
 mount -o rw,remount /system
+
+# Prima
+ui_print "Setting up Prima..."
+if [ -f "/vendor/lib/modules/pronto_wlan.ko" ]; then
+    cp pronto_wlan.ko modules/vendor/lib/modules
+    # Ugly hack for some ROMs
+    if [ -f "/system/lib/modules/pronto_wlan.ko" ]; then
+        cp pronto_wlan.ko modules/system/lib/modules
+    fi
+fi
+
+# Patches
 # Prevent init from overriding kernel tweaks.
 ui_print "Patching init..."
 # IMO this is kinda destructive but works
