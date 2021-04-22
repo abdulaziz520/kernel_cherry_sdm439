@@ -20,8 +20,7 @@ out/scripts/sign-file sha512 out/certs/signing_key.pem out/certs/signing_key.x50
 
 # Build flashable zip
 cp out/arch/arm64/boot/dtbo.img AnyKernel3/
-cp out/drivers/staging/prima/wlan.ko AnyKernel3/modules/vendor/lib/modules/pronto_wlan.ko
-cp out/drivers/staging/prima/wlan.ko AnyKernel3/modules/system/lib/modules/pronto_wlan.ko
+cp out/drivers/staging/prima/wlan.ko AnyKernel3/pronto_wlan.ko
 cp out/arch/arm64/boot/Image.gz-dtb AnyKernel3/
 zipfile="./out/CherryKernel_$(date +%Y%m%d-%H%M).zip"
 7z a -mm=Deflate -mfb=258 -mpass=15 -r $zipfile ./AnyKernel3/*
